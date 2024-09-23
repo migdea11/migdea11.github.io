@@ -5,18 +5,21 @@ on:
     types: [deploy]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the destination repository
+      # Step 1: Checkout Destination Repository
       - name: Checkout Destination Repository
         uses: actions/checkout@v3
         with:
           path: destination
 
-      # Checkout the source repository
+      # Step 2: Checkout Source Repository
       - name: Checkout Source Repository
         uses: actions/checkout@v3
         with:
@@ -24,23 +27,23 @@ jobs:
           token: ${{ secrets.SOURCE_REPO_TOKEN }}
           path: source
 
-      # Install dependencies
+      # Step 3: Install Dependencies
       - name: Install Dependencies
         working-directory: source
         run: npm ci
 
-      # Build the project
+      # Step 4: Build Project
       - name: Build Project
         working-directory: source
         run: npm run build
 
-      # Copy build output to destination
+      # Step 5: Copy Build Output
       - name: Copy Build Output
         run: |
           rm -rf destination/*
           cp -r source/build/* destination/
 
-      # Commit and push changes
+      # Step 6: Commit and Push Changes
       - name: Commit and Push Changes
         working-directory: destination
         run: |
