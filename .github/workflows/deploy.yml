@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+  repository_dispatch:
+    types: [deploy]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the destination repository
+      - name: Checkout Destination Repository
+        uses: actions/checkout@v3
+        with:
+          path: destination
+
+      # Checkout the source repository
+      - name: Checkout Source Repository
+        uses: actions/checkout@v3
+        with:
+          repository: suchali93/miguel-portfolio
+          token: ${{ secrets.SOURCE_REPO_TOKEN }}
+          path: source
+
+      # Install dependencies
+      - name: Install Dependencies
+        working-directory: source
+        run: npm ci
+
+      # Build the project
+      - name: Build Project
+        working-directory: source
+        run: npm run build
+
+      # Copy build output to destination
+      - name: Copy Build Output
+        run: |
+          rm -rf destination/*
+          cp -r source/build/* destination/
+
+      # Commit and push changes
+      - name: Commit and Push Changes
+        working-directory: destination
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Deploy updates from miguel-portfolio" || echo "No changes to commit"
+          git push origin main
