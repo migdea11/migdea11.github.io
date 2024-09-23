@@ -42,7 +42,6 @@ jobs:
         run: |
           rm -rf destination/*
           cp -r source/build/* destination/
-          cp -r source/index.html destination/
 
       # Step 6: Commit and Push Changes
       - name: Commit and Push Changes
